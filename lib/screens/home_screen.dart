@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:todoly/providers/task_provider.dart';
+import 'package:todoly/utils/constants.dart';
 import 'package:todoly/utils/helpers.dart';
+import 'package:todoly/widgets/add_task_dialog.dart';
 import 'package:todoly/widgets/task_tile.dart';
 
 class HomeSreen extends ConsumerWidget {
@@ -78,6 +80,81 @@ class HomeSreen extends ConsumerWidget {
               confirmClearAllTasks(context, tasksNotifier);
             },
           ),
+          PopupMenuButton<dynamic>(
+            icon: const Icon(Icons.filter_list),
+            onSelected: (value) {
+              if (value is TaskFilter) {
+                tasksNotifier.setFilter(value);
+              } else if (value is TaskSort) {
+                tasksNotifier.setSort(value);
+              }
+            },
+            itemBuilder: (context) => [
+              // Filtering options with icons
+              const PopupMenuItem(
+                value: TaskFilter.all,
+                child: Row(
+                  children: [
+                    Icon(Icons.list, color: Colors.blue),
+                    SizedBox(width: 8),
+                    Text('Show All'),
+                  ],
+                ),
+              ),
+              const PopupMenuItem(
+                value: TaskFilter.completed,
+                child: Row(
+                  children: [
+                    Icon(Icons.check_circle, color: Colors.green),
+                    SizedBox(width: 8),
+                    Text('Show Completed'),
+                  ],
+                ),
+              ),
+              const PopupMenuItem(
+                value: TaskFilter.pending,
+                child: Row(
+                  children: [
+                    Icon(Icons.hourglass_bottom, color: Colors.orange),
+                    SizedBox(width: 8),
+                    Text('Show Pending'),
+                  ],
+                ),
+              ),
+              const PopupMenuDivider(),
+              // Sorting options with icons
+              const PopupMenuItem(
+                value: TaskSort.alphabetical,
+                child: Row(
+                  children: [
+                    Icon(Icons.sort_by_alpha, color: Colors.blue),
+                    SizedBox(width: 8),
+                    Text('Sort Alphabetically'),
+                  ],
+                ),
+              ),
+              const PopupMenuItem(
+                value: TaskSort.creationTime,
+                child: Row(
+                  children: [
+                    Icon(Icons.calendar_today, color: Colors.purple),
+                    SizedBox(width: 8),
+                    Text('Sort by Creation Time'),
+                  ],
+                ),
+              ),
+              const PopupMenuItem(
+                value: TaskSort.completionStatus,
+                child: Row(
+                  children: [
+                    Icon(Icons.done_all, color: Colors.teal),
+                    SizedBox(width: 8),
+                    Text('Sort by Completion Status'),
+                  ],
+                ),
+              ),
+            ],
+          ),
         ],
       ),
       body: Column(
@@ -130,47 +207,6 @@ class HomeSreen extends ConsumerWidget {
         },
         child: const Icon(Icons.add),
       ),
-    );
-  }
-}
-
-class AddTaskDialog extends StatelessWidget {
-  AddTaskDialog({
-    super.key,
-    required this.tasksNotifier,
-  });
-
-  final TextEditingController controller = TextEditingController();
-  final TaskNotifier tasksNotifier;
-
-  @override
-  Widget build(BuildContext context) {
-    return AlertDialog(
-      title: const Text('Add New Task'),
-      content: TextField(
-        controller: controller,
-        decoration: const InputDecoration(
-          hintText: 'Enter task title',
-        ),
-      ),
-      actions: [
-        TextButton(
-          onPressed: () => Navigator.pop(context),
-          child: const Text('Cancel'),
-        ),
-        ElevatedButton(
-          style: ElevatedButton.styleFrom(
-            foregroundColor: Colors.black,
-          ),
-          onPressed: () {
-            if (controller.text.isNotEmpty) {
-              tasksNotifier.addTask(controller.text);
-              Navigator.pop(context);
-            }
-          },
-          child: const Text('Add'),
-        ),
-      ],
     );
   }
 }
